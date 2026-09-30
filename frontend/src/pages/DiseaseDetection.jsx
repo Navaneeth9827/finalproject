@@ -1,0 +1,243 @@
+import React, { useState } from 'react';
+import { DiseaseResult } from './DiseaseResult';
+import { Upload, Image as ImageIcon, X, ShieldAlert, Loader2, AlertCircle, RefreshCw, Cpu, CheckCircle2 } from 'lucide-react';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+
+export const DiseaseDetection = () => {
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [result, setResult] = useState(null);
+  const [dragActive, setDragActive] = useState(false);
+
+  const handleFileChange = (file) => {
+    setError('');
+    setResult(null);
+
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setError('Please select a valid image file (JPEG or PNG).');
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      setError('Image size exceeds 10 MB limit. Please select a smaller photo.');
+      return;
+    }
+
+    setSelectedFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileChange(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedFile(null);
+    setImagePreview(null);
+    setResult(null);
+    setError('');
+  };
+
+  const handleAnalyze = async () => {
+    if (!selectedFile) return;
+
+    setLoading(true);
+    setError('');
+    setResult(null);
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/predict`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.detail || 'Inference API server error.');
+      }
+
+      const data = await response.json();
+      setResult(data);
+    } catch (err) {
+      console.error('Inference error:', err);
+      setError(err.message || 'Unable to connect to Disease Detection backend server.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-[calc(100vh-4rem)] bg-slate-50 py-10 px-4 sm:px-6 lg:px-8 font-sans">
+      <div className="max-w-4xl mx-auto space-y-8">
+        
+        {/* Header */}
+        <div className="text-center max-w-2xl mx-auto">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white mx-auto flex items-center justify-center shadow-md shadow-emerald-200 mb-4">
+            <ShieldAlert className="w-7 h-7" />
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+            Tomato Leaf Diagnostic Scan
+          </h1>
+          <p className="text-slate-600 font-medium text-sm mt-2">
+            Upload a high-resolution photo of an affected tomato leaf for instant VMamba AI analysis and custom treatment advisory.
+          </p>
+        </div>
+
+        {/* Upload Dropzone Card */}
+        <div className="bg-white p-6 sm:p-10 rounded-3xl border border-slate-200/80 shadow-xl shadow-slate-200/50">
+          
+          {error && (
+            <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+              <span>{error}</span>
+            </div>
+          )}
+
+          {!imagePreview ? (
+            <div
+              onDragEnter={handleDrag}
+              onDragOver={handleDrag}
+              onDragLeave={handleDrag}
+              onDrop={handleDrop}
+              className={`border-3 border-dashed rounded-3xl p-8 sm:p-12 text-center transition-all ${
+                dragActive
+                  ? 'border-emerald-500 bg-emerald-50/60 scale-[1.01]'
+                  : 'border-slate-300 hover:border-emerald-400 bg-slate-50/40 hover:bg-slate-50'
+              }`}
+            >
+              <div className="w-16 h-16 rounded-2xl bg-emerald-100/80 text-emerald-700 mx-auto flex items-center justify-center mb-4 shadow-xs">
+                <Upload className="w-8 h-8" />
+              </div>
+
+              <h3 className="text-lg font-bold text-slate-900 mb-1">
+                Drag and drop your leaf photo here
+              </h3>
+              <p className="text-xs text-slate-500 font-medium mb-6">
+                Supports JPG, JPEG, and PNG format (max 10 MB)
+              </p>
+
+              <label className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl btn-primary text-sm font-bold shadow-md cursor-pointer transition-all">
+                <ImageIcon className="w-4 h-4" />
+                <span>Select Photo File</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => e.target.files && handleFileChange(e.target.files[0])}
+                  className="hidden"
+                />
+              </label>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              
+              {/* Image Preview Box with Scanner Overlay during Loading */}
+              <div className="relative rounded-2xl overflow-hidden bg-slate-900 border border-slate-200 max-h-96 flex items-center justify-center group">
+                <img
+                  src={imagePreview}
+                  alt="Selected Tomato Leaf"
+                  className="max-h-96 w-auto object-contain rounded-2xl"
+                />
+
+                {/* Scan Line Animation Overlay */}
+                {loading && (
+                  <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-xs flex flex-col items-center justify-center text-white">
+                    <div className="scan-animation" />
+                    <div className="bg-slate-900/90 border border-emerald-500/40 px-5 py-3 rounded-2xl flex items-center gap-3 shadow-xl">
+                      <Loader2 className="w-5 h-5 text-emerald-400 animate-spin" />
+                      <div className="text-left">
+                        <div className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Scanning Leaf</div>
+                        <div className="text-xs text-slate-300 font-medium">VMamba SS2D Selective Model...</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {!loading && (
+                  <button
+                    onClick={handleRemoveImage}
+                    className="absolute top-3 right-3 p-2 rounded-full bg-slate-900/80 hover:bg-red-600 text-white transition-colors shadow-md"
+                    title="Remove Image"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-between items-center pt-2">
+                <div className="text-xs font-semibold text-slate-500 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>Out-of-Scope Quality Guard Active</span>
+                </div>
+
+                <div className="flex gap-3 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    disabled={loading}
+                    className="flex-1 sm:flex-none px-5 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition-colors flex items-center justify-center gap-2"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    <span>Choose Different Image</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleAnalyze}
+                    disabled={loading}
+                    className="flex-1 sm:flex-none px-8 py-3.5 rounded-2xl btn-primary text-base font-bold shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <span>Analyzing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Cpu className="w-5 h-5" />
+                        <span>Run AI Analysis</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          )}
+
+        </div>
+
+        {/* Diagnostic Results Display */}
+        {result && <DiseaseResult result={result} imagePreview={imagePreview} />}
+
+      </div>
+    </div>
+  );
+};
