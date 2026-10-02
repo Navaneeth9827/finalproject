@@ -11,8 +11,9 @@ import { SignUpPage } from './pages/SignUpPage';
 import { ProfileSetup } from './pages/ProfileSetup';
 import { Dashboard } from './pages/Dashboard';
 import { DiseaseDetection } from './pages/DiseaseDetection';
+import { CommunityPage } from './pages/CommunityPage';
 import { ProfilePage } from './pages/ProfilePage';
-import { ReportsPage } from './pages/ReportsPage';
+import { PricePrediction } from './pages/PricePrediction';
 
 export default function App() {
   return (
@@ -53,18 +54,26 @@ export default function App() {
                 }
               />
               <Route
-                path="/profile"
+                path="/price-prediction"
                 element={
                   <ProtectedRoute requireProfile={true}>
-                    <ProfilePage />
+                    <PricePrediction />
                   </ProtectedRoute>
                 }
               />
               <Route
-                path="/reports"
+                path="/community"
                 element={
-                  <ProtectedRoute requireProfile={false}>
-                    <ReportsPage />
+                  <ProtectedRoute requireProfile={true}>
+                    <CommunityPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute requireProfile={true}>
+                    <ProfilePage />
                   </ProtectedRoute>
                 }
               />

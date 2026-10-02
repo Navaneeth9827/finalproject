@@ -44,7 +44,89 @@ export const DiseaseResult = ({ result, imagePreview }) => {
     );
   }
 
-  // 3. Success Diagnosis Display
+  // 3. Healthy Prediction Display
+  if (result.disease === 'Healthy' || result.is_healthy) {
+    const confidencePercent = Math.round((result.confidence || 0) * 100);
+    return (
+      <div className="space-y-8">
+        
+        {/* Healthy Result Header Card */}
+        <div className="bg-white rounded-3xl border border-emerald-200 shadow-xl shadow-emerald-50 p-8 sm:p-10">
+          <div className="flex flex-col md:flex-row gap-8 items-start md:items-center justify-between">
+            
+            <div className="space-y-3">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs uppercase tracking-wider">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span>Diagnostic Result</span>
+              </div>
+
+              <h2 className="text-3xl sm:text-4xl font-black text-slate-900">
+                Healthy Tomato Leaf
+              </h2>
+
+              <p className="text-emerald-700 font-semibold text-base">
+                No disease detected. Your crop leaf appears healthy and vigorous!
+              </p>
+            </div>
+
+            {/* Confidence Badge */}
+            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 text-center shrink-0 w-full sm:w-auto">
+              <div className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Model Confidence</div>
+              <div className="text-3xl font-black text-emerald-600 mt-1">{confidencePercent}%</div>
+              <div className="text-[11px] text-emerald-700 font-medium">VMamba Tiny Fine-tuned</div>
+            </div>
+
+          </div>
+
+          {/* Image Preview Thumbnail */}
+          {imagePreview && (
+            <div className="mt-6 pt-6 border-t border-slate-100 flex items-center gap-4">
+              <img
+                src={imagePreview}
+                alt="Analyzed Leaf"
+                className="w-20 h-20 object-cover rounded-xl border border-slate-200 shadow-sm"
+              />
+              <div>
+                <p className="text-xs font-bold text-slate-500 uppercase">Uploaded Image</p>
+                <p className="text-sm font-semibold text-slate-800">Analyzed for 10 Tomato Leaf Classes</p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Good Maintenance Advisory Card */}
+        <div className="bg-emerald-50/80 border border-emerald-200 rounded-3xl p-8 space-y-6">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-2xl flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-7 h-7" />
+            </div>
+            <div>
+              <h3 className="text-xl font-black text-emerald-900">Recommended Crop Maintenance</h3>
+              <p className="text-emerald-700 text-xs font-medium">Keep your tomato crop thriving with good agricultural practices</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="bg-white p-5 rounded-2xl border border-emerald-100 space-y-2 shadow-xs">
+              <h4 className="font-bold text-slate-900 text-sm">Balanced Drip Irrigation</h4>
+              <p className="text-slate-600 text-xs font-medium">Water at plant base to keep foliage dry and avoid leaf moisture that encourages fungal spores.</p>
+            </div>
+            <div className="bg-white p-5 rounded-2xl border border-emerald-100 space-y-2 shadow-xs">
+              <h4 className="font-bold text-slate-900 text-sm">Optimal Soil Nutrition</h4>
+              <p className="text-slate-600 text-xs font-medium">Maintain recommended N-P-K fertilization and organic compost to strengthen plant immunity.</p>
+            </div>
+            <div className="bg-white p-5 rounded-2xl border border-emerald-100 space-y-2 shadow-xs">
+              <h4 className="font-bold text-slate-900 text-sm">Weekly Inspection</h4>
+              <p className="text-slate-600 text-xs font-medium">Regularly inspect leaf undersides for early signs of pests, whiteflies, or minor spots.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    );
+  }
+
+  // 4. Success Disease Diagnosis Display
   const info = result.disease_info || {};
   const confidencePercent = Math.round((result.confidence || 0) * 100);
 
@@ -70,6 +152,20 @@ export const DiseaseResult = ({ result, imagePreview }) => {
                 {info.scientific_name}
               </p>
             )}
+
+            {/* Supabase Community Report Status Badge */}
+            {result.community_status === 'success' && (
+              <div className="mt-2 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span>Community Report Saved to Supabase ({result.community_district} District)</span>
+              </div>
+            )}
+            {result.community_status === 'error' && (
+              <div className="mt-2 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-50 border border-red-200 text-red-700 text-xs font-bold">
+                <AlertTriangle className="w-4 h-4 text-red-500" />
+                <span>Supabase Community INSERT Error: {result.community_error}</span>
+              </div>
+            )}
           </div>
 
           {/* Confidence Badge */}
@@ -91,7 +187,7 @@ export const DiseaseResult = ({ result, imagePreview }) => {
             />
             <div>
               <p className="text-xs font-bold text-slate-500 uppercase">Uploaded Image</p>
-              <p className="text-sm font-semibold text-slate-800">Analyzed for 9 Tomato Disease Classes</p>
+              <p className="text-sm font-semibold text-slate-800">Analyzed for 10 Tomato Leaf Classes</p>
             </div>
           </div>
         )}

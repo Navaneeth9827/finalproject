@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { supabase } from '../lib/supabase';
 import { DiseaseResult } from './DiseaseResult';
 import { Upload, Image as ImageIcon, X, ShieldAlert, Loader2, AlertCircle, RefreshCw, Cpu, CheckCircle2 } from 'lucide-react';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 export const DiseaseDetection = () => {
+  const { user, profile } = useAuth();
   const [selectedFile, setSelectedFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -85,6 +88,115 @@ export const DiseaseDetection = () => {
 
       const data = await response.json();
       setResult(data);
+
+      // Process Community Disease Report only for valid, reliable disease detections
+      if (data.status === 'success' && !data.uncertain && data.disease && !data.disease.toLowerCase().includes('healthy')) {
+        (async () => {
+          try {
+            // 1. Get logged-in farmer from Supabase Auth
+            const { data: authData, error: authErr } = await supabase.auth.getUser();
+            const currentUser = authData?.user;
+
+            if (authErr || !currentUser) {
+              console.error('Community report creation skipped: Logged-in farmer could not be retrieved from Supabase Auth.', authErr);
+              setResult(prev => ({ ...prev, community_status: 'error', community_error: 'User not authenticated in Supabase Auth' }));
+              return;
+            }
+
+            // 2. Read farmer's district and main_crop from existing farmer_profiles Supabase table
+            const { data: dbProfile, error: profileErr } = await supabase
+              .from('farmer_profiles')
+              .select('district, main_crop')
+              .eq('id', currentUser.id)
+              .maybeSingle();
+
+            if (profileErr) {
+              console.error('Supabase SELECT failed for farmer_profiles:', profileErr.message, profileErr);
+              setResult(prev => ({ ...prev, community_status: 'error', community_error: `farmer_profiles query error: ${profileErr.message}` }));
+              return;
+            }
+
+            if (!dbProfile?.district) {
+              console.error('Community report creation skipped: Logged-in farmer has no district in farmer_profiles table.');
+              setResult(prev => ({ ...prev, community_status: 'error', community_error: 'No district saved in farmer profile' }));
+              return;
+            }
+
+            const farmerDistrict = dbProfile.district;
+            const farmerCrop = dbProfile.main_crop || 'Tomato';
+
+            // 3. Get matching disease information from existing disease_knowledge Supabase table
+            let diseaseKnowledgeRecord = null;
+            const { data: dkData, error: dkErr } = await supabase
+              .from('disease_knowledge')
+              .select('*')
+              .eq('disease_name', data.disease)
+              .maybeSingle();
+
+            if (dkErr) {
+              console.error('Supabase SELECT failed for disease_knowledge:', dkErr.message, dkErr);
+            } else if (dkData) {
+              diseaseKnowledgeRecord = dkData;
+            }
+
+            // 4. Generate Community warning using Groq from that verified information
+            const groqRes = await fetch(`${API_BASE_URL}/api/community/generate-warning`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                crop_name: farmerCrop,
+                disease_name: data.disease,
+                district: farmerDistrict,
+                disease_info: diseaseKnowledgeRecord || data.disease_info || {}
+              })
+            });
+
+            if (!groqRes.ok) {
+              const errText = await groqRes.text();
+              console.error('Groq warning generation backend request failed:', errText);
+              setResult(prev => ({ ...prev, community_status: 'error', community_error: 'Groq warning generation failed' }));
+              return;
+            }
+
+            const groqData = await groqRes.json();
+            if (!groqData?.warning_message) {
+              console.error('Groq warning generation returned empty warning_message. INSERT cancelled.');
+              setResult(prev => ({ ...prev, community_status: 'error', community_error: 'Groq generated empty message' }));
+              return;
+            }
+
+            // 5. INSERT resulting Community report into existing Supabase table: community_disease_reports
+            const reportPayload = {
+              farmer_id: currentUser.id,
+              district: farmerDistrict,
+              crop_name: farmerCrop,
+              disease_name: data.disease,
+              confidence: data.confidence,
+              disease_knowledge_id: diseaseKnowledgeRecord?.id || null,
+              warning_title: groqData.warning_title || data.disease,
+              warning_message: groqData.warning_message,
+              is_active: true,
+              detected_at: new Date().toISOString()
+            };
+
+            const { data: insertedData, error: insertErr } = await supabase
+              .from('community_disease_reports')
+              .insert([reportPayload])
+              .select();
+
+            if (insertErr) {
+              console.error('Supabase INSERT failed for community_disease_reports:', insertErr.message, insertErr);
+              setResult(prev => ({ ...prev, community_status: 'error', community_error: insertErr.message }));
+            } else {
+              console.log('Successfully saved Community Report to Supabase community_disease_reports:', insertedData);
+              setResult(prev => ({ ...prev, community_status: 'success', community_district: farmerDistrict, community_report: insertedData?.[0] }));
+            }
+          } catch (commErr) {
+            console.error('Community report processing error:', commErr);
+            setResult(prev => ({ ...prev, community_status: 'error', community_error: commErr.message }));
+          }
+        })();
+      }
     } catch (err) {
       console.error('Inference error:', err);
       setError(err.message || 'Unable to connect to Disease Detection backend server.');

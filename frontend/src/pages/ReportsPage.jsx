@@ -56,7 +56,7 @@ export const ReportsPage = () => {
               VMamba / VSSM Tiny Performance Report
             </h1>
             <p className="text-slate-300 text-xs sm:text-sm font-medium mt-2 max-w-xl leading-relaxed">
-              Empirical evaluation results measured on 2,486 held-out test set photos across 9 tomato crop disease classes.
+              Empirical evaluation results measured on held-out test set photos across 10 tomato leaf classes (9 diseases + Healthy).
             </p>
           </div>
 
@@ -73,19 +73,19 @@ export const ReportsPage = () => {
           <div className="card-product p-6 rounded-3xl space-y-2">
             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Top-1 Accuracy</span>
             <div className="text-3xl font-black text-emerald-600">{test.accuracy}%</div>
-            <p className="text-xs text-slate-500 font-medium">Measured on 2,486 test photos</p>
+            <p className="text-xs text-slate-500 font-medium">Measured on held-out test set</p>
           </div>
 
           <div className="card-product p-6 rounded-3xl space-y-2">
             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Macro Precision</span>
             <div className="text-3xl font-black text-teal-600">{test.precision_macro}%</div>
-            <p className="text-xs text-slate-500 font-medium">Average precision across 9 classes</p>
+            <p className="text-xs text-slate-500 font-medium">Average precision across 10 classes</p>
           </div>
 
           <div className="card-product p-6 rounded-3xl space-y-2">
             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Macro Recall</span>
             <div className="text-3xl font-black text-blue-600">{test.recall_macro}%</div>
-            <p className="text-xs text-slate-500 font-medium">Average sensitivity across 9 classes</p>
+            <p className="text-xs text-slate-500 font-medium">Average sensitivity across 10 classes</p>
           </div>
 
           <div className="card-product p-6 rounded-3xl space-y-2">

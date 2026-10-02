@@ -47,7 +47,7 @@ def train_model(
 
     # Build VMamba model
     print("\n--- Initializing VMamba Tiny Model ---")
-    model = build_vssm_tiny(num_classes=9, pretrained_path=pretrained_path)
+    model = build_vssm_tiny(num_classes=10, pretrained_path=pretrained_path)
     model = model.to(device)
 
     backbone_params = []

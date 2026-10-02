@@ -28,35 +28,34 @@ export const LandingPage = () => {
               to="/signup"
               className="w-full sm:w-auto px-8 py-4 rounded-2xl btn-primary text-base font-bold shadow-lg flex items-center justify-center gap-2 group"
             >
-              <span>Start Free Diagnosis</span>
+              <span>Get Started Free</span>
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
-              to="/reports"
+              to="/login"
               className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 font-bold text-base border border-slate-200 shadow-xs transition-colors flex items-center justify-center gap-2"
             >
-              <Award className="w-5 h-5 text-emerald-600" />
-              <span>View Accuracy Metrics</span>
+              <span>Sign In</span>
             </Link>
           </div>
 
-          {/* Key Metrics Banner */}
+          {/* Key Capabilities Banner */}
           <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
             <div className="card-product p-5 rounded-2xl text-center">
-              <div className="text-2xl sm:text-3xl font-black text-emerald-600">98.15%</div>
-              <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">Test Accuracy</div>
+              <div className="text-2xl sm:text-3xl font-black text-emerald-600">AI Diagnostics</div>
+              <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">Instant Scan</div>
             </div>
             <div className="card-product p-5 rounded-2xl text-center">
-              <div className="text-2xl sm:text-3xl font-black text-teal-600">&lt; 2 Sec</div>
-              <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">Scan Speed</div>
+              <div className="text-2xl sm:text-3xl font-black text-teal-600">Community</div>
+              <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">District Alerts</div>
             </div>
             <div className="card-product p-5 rounded-2xl text-center">
               <div className="text-2xl sm:text-3xl font-black text-slate-900">9 Classes</div>
-              <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">Disease Range</div>
+              <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">Disease Scope</div>
             </div>
             <div className="card-product p-5 rounded-2xl text-center">
-              <div className="text-2xl sm:text-3xl font-black text-emerald-700">OOD Shield</div>
-              <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">Quality Guard</div>
+              <div className="text-2xl sm:text-3xl font-black text-emerald-700">Quality Shield</div>
+              <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">OOD Validation</div>
             </div>
           </div>
 

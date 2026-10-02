@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Leaf, ShieldAlert, BarChart3, User, LogOut, Menu, X, LayoutDashboard } from 'lucide-react';
+import { Leaf, ShieldAlert, Users, User, LogOut, Menu, X, LayoutDashboard, TrendingUp } from 'lucide-react';
 
 export const Navbar = () => {
   const { user, profile, signOut } = useAuth();
@@ -69,15 +69,27 @@ export const Navbar = () => {
                 </Link>
 
                 <Link
-                  to="/reports"
+                  to="/price-prediction"
                   className={`px-3.5 py-2 rounded-lg font-semibold text-sm transition-all flex items-center gap-1.5 ${
-                    isActive('/reports')
+                    isActive('/price-prediction')
                       ? 'bg-emerald-50 text-emerald-800 font-bold'
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/60'
                   }`}
                 >
-                  <BarChart3 className="w-4 h-4 text-emerald-600" />
-                  Analytics Report
+                  <TrendingUp className="w-4 h-4 text-emerald-600" />
+                  Price Prediction
+                </Link>
+
+                <Link
+                  to="/community"
+                  className={`px-3.5 py-2 rounded-lg font-semibold text-sm transition-all flex items-center gap-1.5 ${
+                    isActive('/community')
+                      ? 'bg-emerald-50 text-emerald-800 font-bold'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/60'
+                  }`}
+                >
+                  <Users className="w-4 h-4 text-emerald-600" />
+                  Community
                 </Link>
               </>
             ) : (
@@ -165,11 +177,18 @@ export const Navbar = () => {
                 Disease Detection
               </Link>
               <Link
-                to="/reports"
+                to="/price-prediction"
                 onClick={() => setMobileMenuOpen(false)}
                 className="block px-3 py-2 rounded-lg font-semibold text-sm text-slate-700 hover:bg-slate-100"
               >
-                Analytics Report
+                Price Prediction
+              </Link>
+              <Link
+                to="/community"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-3 py-2 rounded-lg font-semibold text-sm text-slate-700 hover:bg-slate-100"
+              >
+                Community
               </Link>
               <Link
                 to="/profile"

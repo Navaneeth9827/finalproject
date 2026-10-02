@@ -22,7 +22,7 @@ def evaluate_model(
     device = torch.device("cpu") # Use CPU for clean stable metric evaluation
 
     print("\n--- Loading Model for Evaluation ---")
-    model = build_vssm_tiny(num_classes=9)
+    model = build_vssm_tiny(num_classes=10)
     checkpoint = torch.load(model_path, map_location=device)
     model.load_state_dict(checkpoint["model_state_dict"])
     model = model.to(device)
@@ -39,7 +39,7 @@ def evaluate_model(
     all_targets = []
     all_probs = []
 
-    print("\n--- Running Evaluation on Held-Out Test Set (2,486 images) ---")
+    print(f"\n--- Running Evaluation on Held-Out Test Set ({len(test_s)} images) ---")
     with torch.no_grad():
         for images, targets in test_loader:
             images = images.to(device)
@@ -95,7 +95,7 @@ def evaluate_model(
         "dataset": {
             "source": "PlantVillage Tomato Color",
             "total_diseased_images": len(train_s) + len(val_s) + len(test_s),
-            "num_classes": 9,
+            "num_classes": 10,
             "train_count": len(train_s),
             "val_count": len(val_s),
             "test_count": len(test_s),

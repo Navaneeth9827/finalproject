@@ -16,6 +16,7 @@ TOMATO_CLASSES = [
     ("Tomato___Target_Spot", "Target Spot"),
     ("Tomato___Tomato_mosaic_virus", "Tomato Mosaic Virus"),
     ("Tomato___Tomato_Yellow_Leaf_Curl_Virus", "Tomato Yellow Leaf Curl Virus"),
+    ("Tomato___healthy", "Healthy"),
 ]
 
 CLASS_NAME_MAP = {dir_name: clean_name for dir_name, clean_name in TOMATO_CLASSES}
@@ -37,7 +38,7 @@ def get_tomato_image_index(data_dir=os.path.join("data", "tomato_images"), seed=
                     full_path = os.path.join(folder_path, fname)
                     samples.append((full_path, cls_idx, clean_name))
 
-    print(f"Total Tomato Disease Images Found: {len(samples)} across 9 classes")
+    print(f"Total Tomato Images Found: {len(samples)} across {len(TOMATO_CLASSES)} classes")
 
     paths = [s[0] for s in samples]
     labels = [s[1] for s in samples]

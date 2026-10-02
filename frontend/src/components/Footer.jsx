@@ -28,7 +28,7 @@ export const Footer = () => {
             </p>
             <div className="flex items-center gap-2 text-xs font-semibold text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-3 py-1.5 rounded-lg w-fit">
               <MapPin className="w-3.5 h-3.5" />
-              <span>Optimized for Kolar Region Farmers</span>
+              <span>District-Based Crop Advisory</span>
             </div>
           </div>
 
@@ -42,13 +42,13 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/dashboard" className="hover:text-emerald-400 transition-colors">
-                  Farmer Advisory Dashboard
+                <Link to="/community" className="hover:text-emerald-400 transition-colors">
+                  District Community Warnings
                 </Link>
               </li>
               <li>
-                <Link to="/reports" className="hover:text-emerald-400 transition-colors">
-                  Model Accuracy & Benchmark
+                <Link to="/dashboard" className="hover:text-emerald-400 transition-colors">
+                  Farmer Advisory Dashboard
                 </Link>
               </li>
               <li>
@@ -70,7 +70,7 @@ export const Footer = () => {
                 <span>Krishi Vigyan Kendra (KVK) Network</span>
               </li>
               <li className="flex items-center gap-1.5">
-                <span>PlantVillage Tomato Knowledge Base</span>
+                <span>PlantVillage Crop Knowledge Base</span>
               </li>
               <li className="flex items-center gap-1.5">
                 <span>Out-of-Scope Quality Shield Filter</span>
@@ -80,14 +80,14 @@ export const Footer = () => {
 
           {/* Platform Standards */}
           <div className="space-y-3">
-            <h4 className="text-white text-xs font-bold uppercase tracking-wider">System Standards</h4>
+            <h4 className="text-white text-xs font-bold uppercase tracking-wider">Early Warning Protection</h4>
             <div className="p-3.5 rounded-2xl bg-slate-800/80 border border-slate-700/60 space-y-2 text-xs">
               <div className="flex items-center gap-2 text-emerald-400 font-bold">
                 <Shield className="w-4 h-4" />
-                <span>98.15% Precision Accuracy</span>
+                <span>Community Early Warning</span>
               </div>
               <p className="text-slate-400 text-[11px] leading-relaxed">
-                Fine-tuned VMamba vision architecture trained on over 16,000 verified crop samples.
+                Connects validated crop diagnoses to local district alerts to help neighboring farms prevent disease outbreaks.
               </p>
             </div>
           </div>
